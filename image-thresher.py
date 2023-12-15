@@ -2,6 +2,7 @@ import time
 from tkinter import *
 from tkinter import filedialog
 from PIL import ImageTk, Image
+import os
 
 
 
@@ -23,11 +24,18 @@ lblKeep = None
 lblImage = None
 
 # Maximum dimensions of each image
-maxWidth = 300
-maxHeight = 300
+maxWidth = 600
+maxHeight = 400
 
 # List of input files and the decisions made about them
 imagePaths = []
+# {
+#   'path': path,
+#   'dest': path
+# }
+
+# Index of current image being looked at
+currentImageIndex = 0
 
 # Output folders
 trashFolder = ''
@@ -91,9 +99,19 @@ def startSorting():
     # Make sure we have write access to the folders
     # TODO
     # Read list of images in input folder
-    # TODO
+    fileList = os.listdir(path=inputFolder)
+    global imagePaths
+    imagePaths = [
+        {
+            'path': inputFolder + os.sep + fileName,
+            'dest': ''
+        }
+        for fileName in fileList
+    ]
     # Show sorting window
     showSortingWindow()
+    # Display the first image
+    displayImage()
 
     # os.path.isfile(path)
     # os.path.abspath(path)
@@ -102,9 +120,9 @@ def startSorting():
     # os.sep
     # os.path.basename(pathtofile)
 
-def displayImage(path):
+def displayImage():
     try:
-        img = Image.open(path)
+        img = Image.open(imagePaths[currentImageIndex]['path'])
         width, height = img.size
         if width / height > maxWidth / maxHeight:
             # Set width
@@ -114,9 +132,14 @@ def displayImage(path):
             img = img.resize((round(maxHeight*width/height), maxHeight))
         img = ImageTk.PhotoImage(img)
         global lblImage
+        if lblImage != None:
+            lblImage.destroy()
+        lblImage = Label(currentWindowFrame, image=img)
         lblImage.image = img
-    except:
-        print("Error displaying image")
+        lblImage.grid(row=0, column=0, columnspan=3)
+    except Exception as e:
+        print("Error displaying image:")
+        print(e)
 
 
 # Windows
@@ -150,6 +173,7 @@ def showSetupWindow():
 def showSortingWindow():
     window = newWindow('Sort Images')
     # A place to show the image
+    global lblImage
     lblImage = Label(window)
     lblImage.grid(row=0, column=0, columnspan=3)
     # Buttons
