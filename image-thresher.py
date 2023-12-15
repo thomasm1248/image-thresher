@@ -141,6 +141,16 @@ def displayImage():
         print("Error displaying image:")
         print(e)
 
+def actionUndo(event):
+    # TODO
+
+def actionSaveImage(event):
+    # TODO
+
+def actionThrowAwayImage(event):
+    # TODO
+
+
 
 # Windows
 
@@ -179,7 +189,9 @@ def showSortingWindow():
     # Buttons
     # TODO
     # Keyboard shortcuts
-    # TODO
+    currentWindow.bind("<Left>", actionUndo)
+    currentWindow.bind("<Up>", actionSaveImage)
+    currentWindow.bind("<Down>", actionThrowAwayImage)
 
 
 
