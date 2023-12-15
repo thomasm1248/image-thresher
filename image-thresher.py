@@ -113,6 +113,8 @@ def startSorting():
     # Display the first image
     displayImage()
 
+    # path notes:
+    #
     # os.path.isfile(path)
     # os.path.abspath(path)
     # os.listdir(path=path)
@@ -141,14 +143,49 @@ def displayImage():
         print("Error displaying image:")
         print(e)
 
-def actionUndo(event):
+def moveFilesAndExit():
+    # Move image files to their destinations
     # TODO
+    # Exit the program
+    # TODO
+
+def actionUndo(event):
+    global currentImageIndex
+    # Reverse index back one step
+    currentImageIndex -= 1
+    if currentImageIndex < 0:
+        currentImageIndex = 0
+    displayImage()
 
 def actionSaveImage(event):
-    # TODO
+    global currentImageIndex
+    global keepFolder
+    global imagePaths
+    # Set image dest to keep folder
+    imagePaths[currentImageIndex]['dest'] = keepFolder + os.sep + os.path.basename(imagePaths[currentImageIndex]['path'])
+    # Advance index
+    currentImageIndex += 1
+    # Check if we've reached the end
+    if currentImageIndex >= len(imagePaths):
+        moveFilesAndExit()
+        return
+    # Display the image if we haven't reached the end
+    displayImage()
 
 def actionThrowAwayImage(event):
-    # TODO
+    global currentImageIndex
+    global trashFolder
+    global imagePaths
+    # Set image dest to trash folder
+    imagePaths[currentImageIndex]['dest'] = trashFolder + os.sep + os.path.basename(imagePaths[currentImageIndex]['path'])
+    # Advance index
+    currentImageIndex += 1
+    # Check if we've reached the end
+    if currentImageIndex >= len(imagePaths):
+        moveFilesAndExit()
+        return
+    # Display the image if we haven't reached the end
+    displayImage()
 
 
 
