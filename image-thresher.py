@@ -113,15 +113,6 @@ def startSorting():
     # Display the first image
     displayImage()
 
-    # path notes:
-    #
-    # os.path.isfile(path)
-    # os.path.abspath(path)
-    # os.listdir(path=path)
-    # os.rename(curpath, newpath)
-    # os.sep
-    # os.path.basename(pathtofile)
-
 def displayImage():
     try:
         img = Image.open(imagePaths[currentImageIndex]['path'])
@@ -145,9 +136,10 @@ def displayImage():
 
 def moveFilesAndExit():
     # Move image files to their destinations
-    # TODO
+    for image in imagePaths:
+        os.rename(image['path'], image['dest'])
     # Exit the program
-    # TODO
+    endProgram()
 
 def actionUndo(event):
     global currentImageIndex
