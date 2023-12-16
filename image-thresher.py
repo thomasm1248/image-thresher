@@ -6,6 +6,16 @@ import os
 
 
 
+# Settings
+
+CONFIG_FILE_PATH = "image-thresher.conf"
+
+# Maximum dimensions of each image
+maxWidth = 600
+maxHeight = 400
+
+
+
 # Globals
 
 # Set to false to quit program
@@ -22,10 +32,6 @@ lblKeep = None
 
 # The place to display each image
 lblImage = None
-
-# Maximum dimensions of each image
-maxWidth = 600
-maxHeight = 400
 
 # List of input files and the decisions made about them
 imagePaths = []
@@ -98,6 +104,13 @@ def startSorting():
     # TODO
     # Make sure we have write access to the folders
     # TODO
+    # Save folder list to file
+    try:
+        file = open(CONFIG_FILE_PATH, "w")
+        file.write("%s\n%s\n%s\n"%(inputFolder, trashFolder, keepFolder));
+        file.close()
+    except:
+        print("Failed to save folder settings")
     # Read list of images in input folder
     fileList = os.listdir(path=inputFolder)
     global imagePaths
@@ -202,9 +215,6 @@ def actionFinish(event):
 
 def showSetupWindow():
     window = newWindow('Setup');
-    # Instruction label
-    lblInstruction = Label(window, text="Choose folders")
-    lblInstruction.grid(row=0, column=0, columnspan=2)
     # Buttons for selecting the folders
     btnBrowseInput = Button(window, text="Select Input", command=browseInput)
     btnBrowseInput.grid(row=1, column=0)
@@ -222,6 +232,17 @@ def showSetupWindow():
     global lblKeep
     lblKeep = Label(window)
     lblKeep.grid(row=3, column=1)
+    # Try to load folder paths from previous execution
+    if os.path.isfile(CONFIG_FILE_PATH):
+        # Read folder paths from file
+        file = open(CONFIG_FILE_PATH)
+        lines = file.readlines()
+        lines = [s.strip() for s in lines]
+        file.close()
+        # Put paths in label text
+        lblInput['text'] = lines[0]
+        lblTrash['text'] = lines[1]
+        lblKeep['text'] = lines[2]
     # Start button
     btnStart = Button(window, text="Start", command=startSorting)
     btnStart.grid(row=4, column=0, columnspan=2)
@@ -244,6 +265,7 @@ def showSortingWindow():
 
 # Init
 
+# Show setup window
 showSetupWindow()
 # Main loop
 while keepRunning:
