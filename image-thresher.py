@@ -114,25 +114,31 @@ def startSorting():
     displayImage()
 
 def displayImage():
-    try:
-        img = Image.open(imagePaths[currentImageIndex]['path'])
-        width, height = img.size
-        if width / height > maxWidth / maxHeight:
-            # Set width
-            img = img.resize((maxWidth,round(maxWidth*height/width)))
-        else:
-            # Set height
-            img = img.resize((round(maxHeight*width/height), maxHeight))
-        img = ImageTk.PhotoImage(img)
-        global lblImage
+    global lblImage
+    if currentImageIndex < len(imagePaths):
+        try:
+            img = Image.open(imagePaths[currentImageIndex]['path'])
+            width, height = img.size
+            if width / height > maxWidth / maxHeight:
+                # Set width
+                img = img.resize((maxWidth,round(maxWidth*height/width)))
+            else:
+                # Set height
+                img = img.resize((round(maxHeight*width/height), maxHeight))
+            img = ImageTk.PhotoImage(img)
+            if lblImage != None:
+                lblImage.destroy()
+            lblImage = Label(currentWindowFrame, image=img)
+            lblImage.image = img
+            lblImage.grid(row=0, column=0, columnspan=3)
+        except Exception as e:
+            print("Error displaying image:")
+            print(e)
+    else:
         if lblImage != None:
             lblImage.destroy()
-        lblImage = Label(currentWindowFrame, image=img)
-        lblImage.image = img
+        lblImage = Label(currentWindowFrame, text="Press Enter to confirm changes")
         lblImage.grid(row=0, column=0, columnspan=3)
-    except Exception as e:
-        print("Error displaying image:")
-        print(e)
 
 def moveFilesAndExit():
     # Move image files to their destinations
@@ -153,14 +159,16 @@ def actionSaveImage(event):
     global currentImageIndex
     global keepFolder
     global imagePaths
+    # Make sure we're not at the end
+    if currentImageIndex >= len(imagePaths):
+        return
     # Set image dest to keep folder
     imagePaths[currentImageIndex]['dest'] = keepFolder + os.sep + os.path.basename(imagePaths[currentImageIndex]['path'])
     # Advance index
     currentImageIndex += 1
-    # Check if we've reached the end
+    # Prevent index from going too far
     if currentImageIndex >= len(imagePaths):
-        moveFilesAndExit()
-        return
+        currentImageIndex = len(imagePaths)
     # Display the image if we haven't reached the end
     displayImage()
 
@@ -168,16 +176,25 @@ def actionThrowAwayImage(event):
     global currentImageIndex
     global trashFolder
     global imagePaths
+    # Make sure we're not at the end
+    if currentImageIndex >= len(imagePaths):
+        return
     # Set image dest to trash folder
     imagePaths[currentImageIndex]['dest'] = trashFolder + os.sep + os.path.basename(imagePaths[currentImageIndex]['path'])
     # Advance index
     currentImageIndex += 1
-    # Check if we've reached the end
+    # Prevent index from going too far
     if currentImageIndex >= len(imagePaths):
-        moveFilesAndExit()
-        return
+        currentImageIndex = len(imagePaths)
     # Display the image if we haven't reached the end
     displayImage()
+
+def actionFinish(event):
+    global currentImageIndex
+    global imagePaths
+    # Make sure we're at the end
+    if currentImageIndex == len(imagePaths):
+        moveFilesAndExit()
 
 
 
@@ -221,6 +238,7 @@ def showSortingWindow():
     currentWindow.bind("<Left>", actionUndo)
     currentWindow.bind("<Up>", actionSaveImage)
     currentWindow.bind("<Down>", actionThrowAwayImage)
+    currentWindow.bind("<Return>", actionFinish)
 
 
 
